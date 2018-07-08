@@ -5,6 +5,8 @@ public class Block {
     public int right;
     public int top;
     public int bottom;
+    public int lives;
+
 
 
 
@@ -13,5 +15,6 @@ public class Block {
         this.right = right;
         this.top = top;
         this.bottom = bottom;
+        this.lives = (int) (Math.random() * 12);
     }
 }
