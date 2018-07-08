@@ -6,7 +6,7 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    private AnimationHelper mAnimationHelper;
+
     private MainCanvas mRainDrops;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,15 +14,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mRainDrops = findViewById(R.id.rainDrops);
-        mAnimationHelper = new AnimationHelper(mRainDrops, 60);
+
 
     }
 
-    public void run(View view) {
-        mAnimationHelper.start();
-    }
 
-    public void pause(View view) {
-        mAnimationHelper.stop();
-    }
 }
