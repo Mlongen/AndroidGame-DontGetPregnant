@@ -18,23 +18,24 @@ import java.util.ArrayList;
 public class MainCanvas extends View {
     private AnimationHelper mAnimationHelper = new AnimationHelper(this, 50);
     private ArrayList<Rect> blocks = new ArrayList<>();
-    private int animationTick = 0;
+    private ArrayList<Lives>  lives = new ArrayList<>();
+    private int animationTick = 1;
     int[] blockPosition = new int[5];
-    int velocity = 20;
+    int velocity = 10;
     int left = 0;
     int left2 = 0;
     int left3 = 0;
     int left4 = 0;
     int area;
     int count = 0;
-    int lives = 1;
+    int liveCount = 1;
     private int width = 0;
     private int height = 0;
     private boolean hasStarted = false;
     private boolean moving = false;
 
 
-    private int skipHit = 0;
+    private int skipBlocks = 0;
 
     private Bitmap character1_left = BitmapFactory.decodeResource(getResources(), R.drawable.character_left);
     private Bitmap character1_right = BitmapFactory.decodeResource(getResources(), R.drawable.character_right);
@@ -65,9 +66,9 @@ public class MainCanvas extends View {
         red.setARGB(255, 255, 0, 0);
         red.setTextSize(60);
         red.setTypeface(Typeface.MONOSPACE);
-        canvas.drawText("Score " + count , width / 2 - 100, 400, red);
-        canvas.drawText("Speed " + velocity , width / 2 - 100, 600, red);
-        canvas.drawText(lives + "" , left, canvas.getHeight()-600, red);
+        canvas.drawText("Score " + count , width / 2 - 100, 200, red);
+        canvas.drawText("Speed " + velocity , width / 2 - 100, 300, red);
+
         blocksColor.setARGB(255, 66, 155, 244);
         blockPosition[0] = 0;
         blockPosition[1] = area;
@@ -82,23 +83,26 @@ public class MainCanvas extends View {
 
         drawCharacters(canvas);
 
-        if (skipHit > 0) {
-            skipHit--;
+        if (skipBlocks > 0) {
+            skipBlocks--;
         }
 
 
-        if (velocity < 20) {
+
+
+
+        if (velocity < 29) {
             if (animationTick % 40 == 0) {
                 int random = (int) (Math.random() * 5);
                 for (int i = 0; i < random; i ++) {
-                    dropBlock();
+                    createBlock();
                 }
             }
         } else {
-            if (animationTick % 20 == 0) {
+            if (animationTick % 15 == 0) {
                 int random = (int) (Math.random() * 5);
                 for (int i = 0; i < random; i ++) {
-                        dropBlock();
+                        createBlock();
 
 
                 }
@@ -106,6 +110,39 @@ public class MainCanvas extends View {
         }
 
 
+        drawBlocks(canvas, red, target);
+
+
+
+        if (animationTick % 500 == 0 && liveCount < 5) {
+            int liveLocation = (int) (Math.random() * width);
+            Lives live = new Lives(liveLocation);
+            lives.add(live);
+
+        }
+        for (int i = 0; i < lives.size();i++) {
+            lives.get(i).y += velocity;
+            canvas.drawCircle(lives.get(i).x,lives.get(i).y,lives.get(i).radius, red);
+        }
+
+        Paint randomTarg = new Paint();
+        randomTarg.setARGB(255, 255, 0, 0);
+//        canvas.drawRect1targetRect,randomTarg);
+
+        checkIfBlockOnScreen(height);
+
+        animationTick++;
+
+        if (animationTick % 100 == 0 && velocity < 30) {
+            velocity++;
+        }
+        count++;
+
+        checkIfEat(target);
+
+    }
+
+    private void drawBlocks(Canvas canvas, Paint red, Block target) {
         for (int i = 0; i < blocks.size(); i++) {
             blocks.get(i).bottom += velocity;
             blocks.get(i).top += velocity;
@@ -113,22 +150,6 @@ public class MainCanvas extends View {
             checkIfHit(target);
 
         }
-
-        Paint randomTarg = new Paint();
-        randomTarg.setARGB(255, 255, 0, 0);
-//        canvas.drawRect(targetRect,randomTarg);
-
-        checkIfBlockOnScreen(height);
-        animationTick++;
-        if (animationTick % 1000 == 0) {
-            lives++;
-
-        }
-        if (animationTick % 100 == 0 && velocity < 30) {
-            velocity++;
-        }
-        count++;
-
     }
 
     private void drawCharacters(Canvas canvas) {
@@ -139,30 +160,30 @@ public class MainCanvas extends View {
             moving = false;
         }
         if (moving) {
-            canvas.drawBitmap(character1_left, left, canvas.getHeight()-500, null);
+            canvas.drawBitmap(character1_left, left, canvas.getHeight()-540, null);
         } else {
 
-            canvas.drawBitmap(character1_right, left, canvas.getHeight()-500, null);
+            canvas.drawBitmap(character1_right, left, canvas.getHeight()-540, null);
         }
-        if (lives > 1) {
+        if (liveCount > 1) {
             if (moving) {
-                canvas.drawBitmap(character2_left, left2, canvas.getHeight()-400, null);
+                canvas.drawBitmap(character2_left, left2, canvas.getHeight()-440, null);
             } else {
-                canvas.drawBitmap(character2_right, left2, canvas.getHeight()-400, null);
+                canvas.drawBitmap(character2_right, left2, canvas.getHeight()-440, null);
             }
         }
-        if (lives > 2) {
+        if (liveCount > 2) {
             if (moving) {
-                canvas.drawBitmap(character3_left, left3, canvas.getHeight()-300, null);
+                canvas.drawBitmap(character3_left, left3, canvas.getHeight()-340, null);
             } else {
-                canvas.drawBitmap(character3_right, left3, canvas.getHeight()-300, null);
+                canvas.drawBitmap(character3_right, left3, canvas.getHeight()-340, null);
             }
         }
-        if (lives > 3) {
+        if (liveCount > 3) {
             if (moving) {
-                canvas.drawBitmap(character4_left, left4, canvas.getHeight()-200, null);
+                canvas.drawBitmap(character4_left, left4, canvas.getHeight()-240, null);
             } else {
-                canvas.drawBitmap(character4_right, left4, canvas.getHeight()-200, null);
+                canvas.drawBitmap(character4_right, left4, canvas.getHeight()-240, null);
             }
         }
     }
@@ -175,7 +196,7 @@ public class MainCanvas extends View {
         }
     }
 
-    public void dropBlock() {
+    public void createBlock() {
         int firstBlock = (int) (Math.random() * 5);
         Block block = new Block(blockPosition[firstBlock], blockPosition[firstBlock] + area, area, 0);
         Rect rectangle = new Rect(block.left, block.top, block.right, block.bottom);
@@ -189,11 +210,11 @@ public class MainCanvas extends View {
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i).bottom > height / 2) {
                 for (int j = 0; j < velocity;j++) {
-                    if (target.top - j == blocks.get(i).top && skipHit == 0) {
+                    if (target.top - j == blocks.get(i).top && skipBlocks == 0) {
                         if (blocks.get(i).left < target.left && target.left < blocks.get(i).right || blocks.get(i).right < target.right && target.right < blocks.get(i).left) {
-                            if (lives > 1){
-                                skipHit +=velocity;
-                                lives--;
+                            if (liveCount > 1){
+                                skipBlocks +=velocity;
+                                liveCount--;
 
                             } else {
                                 Intent intent = new Intent(getRootView().getContext(), Finish.class);
@@ -212,6 +233,25 @@ public class MainCanvas extends View {
 
          }
     }
+
+    public void checkIfEat(Block target) {
+        for (int i = 0; i < lives.size();i++) {
+
+            if (lives.get(i).x + lives.get(i).radius >= target.left &&
+                    lives.get(i).x - lives.get(i).radius <= target.right &&
+                    lives.get(i).y + lives.get(i).radius <= target.top &&
+                    lives.get(i).y - lives.get(i).radius >= target.bottom) {
+                System.out.println("yo");
+                lives.remove(lives.get(i));
+                liveCount++;
+            }
+
+
+
+
+        }
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
