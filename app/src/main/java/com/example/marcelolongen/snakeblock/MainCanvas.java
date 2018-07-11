@@ -127,7 +127,7 @@ public class MainCanvas extends View {
 
         Paint randomTarg = new Paint();
         randomTarg.setARGB(255, 255, 0, 0);
-//        canvas.drawRect1targetRect,randomTarg);
+
 
         checkIfBlockOnScreen(height);
 
@@ -205,38 +205,30 @@ public class MainCanvas extends View {
     }
 
 
-    //TODO: Improve crash logic, it is not perfect
     public void checkIfHit(Block target) {
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i).bottom > height / 2) {
                 for (int j = 0; j < velocity;j++) {
                     if (target.top - j == blocks.get(i).top && skipBlocks == 0) {
-                        if (blocks.get(i).left < target.left && target.left < blocks.get(i).right || blocks.get(i).right < target.right && target.right < blocks.get(i).left) {
+                        if (blocks.get(i).left < target.left && target.left < blocks.get(i).right ||
+                                blocks.get(i).left < target.right && target.right < blocks.get(i).right) {
                             if (liveCount > 1){
-                                skipBlocks +=velocity;
+                                skipBlocks +=velocity - j;
                                 liveCount--;
-
                             } else {
                                 Intent intent = new Intent(getRootView().getContext(), Finish.class);
                                 intent.putExtra("score", count);
                                 getContext().startActivity(intent);
                                 break;
                             }
-
-
                         }
                     }
                 }
             }
-
-
-
          }
     }
-
     public void checkIfEat(Block target) {
         for (int i = 0; i < lives.size();i++) {
-
             if (lives.get(i).x + lives.get(i).radius >= target.left &&
                     lives.get(i).x - lives.get(i).radius <= target.right &&
                     lives.get(i).y + lives.get(i).radius <= target.top &&
@@ -245,13 +237,8 @@ public class MainCanvas extends View {
                 lives.remove(lives.get(i));
                 liveCount++;
             }
-
-
-
-
         }
     }
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
