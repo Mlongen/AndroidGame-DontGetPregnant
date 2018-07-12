@@ -36,17 +36,18 @@ public class MainCanvas extends View {
 
 
     private int skipBlocks = 0;
+    private Bitmap pill = BitmapFactory.decodeResource(getResources(), R.drawable.pill);
+    private Bitmap character1_left = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_left);
+    private Bitmap character1_right = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_right);
+    private Bitmap character2_left = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_pro_left);
+    private Bitmap character2_right = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_pro_right);
 
-    private Bitmap character1_left = BitmapFactory.decodeResource(getResources(), R.drawable.character_left);
-    private Bitmap character1_right = BitmapFactory.decodeResource(getResources(), R.drawable.character_right);
-    private Bitmap character2_left = BitmapFactory.decodeResource(getResources(), R.drawable.character2_left);
-    private Bitmap character2_right = BitmapFactory.decodeResource(getResources(), R.drawable.character2_right);
-    private Bitmap character3_left = BitmapFactory.decodeResource(getResources(), R.drawable.character3_left);
-    private Bitmap character3_right = BitmapFactory.decodeResource(getResources(), R.drawable.character3_right);
-    private Bitmap character4_left = BitmapFactory.decodeResource(getResources(), R.drawable.character4_left);
-    private Bitmap character4_right = BitmapFactory.decodeResource(getResources(), R.drawable.character4_right);
     private Bitmap block = BitmapFactory.decodeResource(getResources(), R.drawable.brick);
     private MotionEvent event;
+    private Bitmap characterL;
+    private Bitmap characterLPRO;
+    private Bitmap characterR;
+    private Bitmap characterRPRO;
 
 
     public MainCanvas(Context context, AttributeSet attrs) {
@@ -58,6 +59,14 @@ public class MainCanvas extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+
+        Bitmap resizedPill = Bitmap.createScaledBitmap(pill, 80, 70, false);
+        characterL = Bitmap.createScaledBitmap(character1_left, 70, 180, false);
+        characterLPRO = Bitmap.createScaledBitmap(character2_left, 70, 180, false);
+        characterR = Bitmap.createScaledBitmap(character1_right, 70, 180, false);
+        characterRPRO = Bitmap.createScaledBitmap(character2_right, 70, 180, false);
+
         area = canvas.getWidth() / 5;
         height = canvas.getHeight();
         width = canvas.getWidth();
@@ -75,9 +84,8 @@ public class MainCanvas extends View {
         blockPosition[2] =  area + area;
         blockPosition[3] = area + area + area;
         blockPosition[4] = area + area + area + area;
-
-        @SuppressLint("DrawAllocation") Block target = new Block(left,
-                left + (area / 2),canvas.getHeight()-450, canvas.getHeight() - 500 - (blockPosition[1] / 2));
+        Block target = new Block(left,
+                left + (area / 3) + 20,canvas.getHeight()-450, canvas.getHeight() - 500 - (blockPosition[1] / 2));
 
 
 
@@ -120,9 +128,11 @@ public class MainCanvas extends View {
             lives.add(live);
 
         }
+
         for (int i = 0; i < lives.size();i++) {
             lives.get(i).y += velocity;
-            canvas.drawCircle(lives.get(i).x,lives.get(i).y,lives.get(i).radius, red);
+            canvas.drawBitmap(resizedPill, lives.get(i).x, lives.get(i).y, null);
+
         }
 
         Paint randomTarg = new Paint();
@@ -131,9 +141,10 @@ public class MainCanvas extends View {
 
         checkIfBlockOnScreen(height);
 
+
         animationTick++;
 
-        if (animationTick % 100 == 0 && velocity < 30) {
+        if (animationTick % 150 == 0 && velocity < 30) {
             velocity++;
         }
         count++;
@@ -159,33 +170,24 @@ public class MainCanvas extends View {
         if (animationTick % 30 == 0) {
             moving = false;
         }
-        if (moving) {
-            canvas.drawBitmap(character1_left, left, canvas.getHeight()-540, null);
-        } else {
+        if (liveCount == 1 && moving) {
+            canvas.drawBitmap(characterL, left, canvas.getHeight()-550, null);
+            canvas.drawBitmap(characterL, left2 - 20, canvas.getHeight()-500, null);
+            canvas.drawBitmap(characterL, left3 + 30, canvas.getHeight()-500, null);
+        } else if (liveCount == 1 && !moving){
+            canvas.drawBitmap(characterR, left, canvas.getHeight()-540, null);
+            canvas.drawBitmap(characterR, left2 - 20, canvas.getHeight()-490, null);
+            canvas.drawBitmap(characterR, left3 + 30, canvas.getHeight()-490, null);
+        } else if (liveCount > 1 && moving) {
+            canvas.drawBitmap(characterLPRO, left, canvas.getHeight()-550, null);
+            canvas.drawBitmap(characterLPRO, left2 - 20, canvas.getHeight()-500, null);
+            canvas.drawBitmap(characterLPRO, left3 + 30, canvas.getHeight()-500, null);
+        } else if (liveCount > 1 && !moving) {
+            canvas.drawBitmap(characterRPRO, left, canvas.getHeight()-540, null);
+            canvas.drawBitmap(characterRPRO, left2 - 20, canvas.getHeight()-490, null);
+            canvas.drawBitmap(characterRPRO, left3 + 30, canvas.getHeight()-490, null);
+        }
 
-            canvas.drawBitmap(character1_right, left, canvas.getHeight()-540, null);
-        }
-        if (liveCount > 1) {
-            if (moving) {
-                canvas.drawBitmap(character2_left, left2, canvas.getHeight()-440, null);
-            } else {
-                canvas.drawBitmap(character2_right, left2, canvas.getHeight()-440, null);
-            }
-        }
-        if (liveCount > 2) {
-            if (moving) {
-                canvas.drawBitmap(character3_left, left3, canvas.getHeight()-340, null);
-            } else {
-                canvas.drawBitmap(character3_right, left3, canvas.getHeight()-340, null);
-            }
-        }
-        if (liveCount > 3) {
-            if (moving) {
-                canvas.drawBitmap(character4_left, left4, canvas.getHeight()-240, null);
-            } else {
-                canvas.drawBitmap(character4_right, left4, canvas.getHeight()-240, null);
-            }
-        }
     }
 
     private void checkIfBlockOnScreen(int height) {
@@ -209,7 +211,7 @@ public class MainCanvas extends View {
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i).bottom > height / 2) {
                 for (int j = 0; j < velocity;j++) {
-                    if (target.top - j == blocks.get(i).top && skipBlocks == 0) {
+                    if (target.top - j == blocks.get(i).bottom && skipBlocks == 0) {
                         if (blocks.get(i).left < target.left && target.left < blocks.get(i).right ||
                                 blocks.get(i).left < target.right && target.right < blocks.get(i).right) {
                             if (liveCount > 1){
@@ -233,9 +235,7 @@ public class MainCanvas extends View {
                     lives.get(i).x - lives.get(i).radius <= target.right &&
                     lives.get(i).y + lives.get(i).radius <= target.top &&
                     lives.get(i).y - lives.get(i).radius >= target.bottom) {
-                System.out.println("yo");
-                lives.remove(lives.get(i));
-                liveCount++;
+
             }
         }
     }

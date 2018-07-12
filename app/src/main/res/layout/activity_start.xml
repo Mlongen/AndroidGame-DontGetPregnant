@@ -3,17 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/colorPrimaryDark"
-    android:gravity="center|bottom"
     android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:gravity="center|top"
+    android:orientation="vertical"
     tools:context=".Start">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/logo" />
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="320dp"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:src="@drawable/sperm" />
 
     <ImageView
         android:id="@+id/start_game"
-        android:onClick="startGame"
         android:layout_width="200dp"
         android:layout_height="100dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="startGame"
         android:src="@drawable/start" />
 
 </LinearLayout>

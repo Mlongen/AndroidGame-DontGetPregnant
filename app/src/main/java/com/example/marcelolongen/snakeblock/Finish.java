@@ -3,6 +3,7 @@ package com.example.marcelolongen.snakeblock;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -20,5 +21,11 @@ public class Finish extends AppCompatActivity {
 
         TextView score = findViewById(R.id.scoreText);
         score.setText(scoreInt + "");
+    }
+
+    public void restartGame(View view) {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+
     }
 }

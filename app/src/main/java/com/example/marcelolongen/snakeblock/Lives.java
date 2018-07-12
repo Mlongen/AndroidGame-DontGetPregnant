@@ -9,6 +9,6 @@ public class Lives {
     public Lives(int x) {
         this.x = x;
         this.y = 0;
-        this.radius = 20;
+        this.radius = 40;
     }
 }
