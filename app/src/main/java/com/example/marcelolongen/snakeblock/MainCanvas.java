@@ -33,7 +33,7 @@ public class MainCanvas extends View {
     private int height = 0;
     private boolean hasStarted = false;
     private boolean moving = false;
-
+    private int showMessage = 0;
 
     private int skipBlocks = 0;
     private Bitmap pill = BitmapFactory.decodeResource(getResources(), R.drawable.pill);
@@ -60,8 +60,7 @@ public class MainCanvas extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
-        Bitmap resizedPill = Bitmap.createScaledBitmap(pill, 80, 70, false);
+        Bitmap resizedPill = Bitmap.createScaledBitmap(pill, 80, 90, false);
         characterL = Bitmap.createScaledBitmap(character1_left, 70, 180, false);
         characterLPRO = Bitmap.createScaledBitmap(character2_left, 70, 180, false);
         characterR = Bitmap.createScaledBitmap(character1_right, 70, 180, false);
@@ -72,11 +71,7 @@ public class MainCanvas extends View {
         width = canvas.getWidth();
         @SuppressLint("DrawAllocation") Paint blocksColor = new Paint();
         @SuppressLint("DrawAllocation") Paint red = new Paint();
-        red.setARGB(255, 255, 0, 0);
-        red.setTextSize(60);
-        red.setTypeface(Typeface.MONOSPACE);
-        canvas.drawText("Score " + count , width / 2 - 100, 200, red);
-        canvas.drawText("Speed " + velocity , width / 2 - 100, 300, red);
+        @SuppressLint("DrawAllocation") Paint white = new Paint();
 
         blocksColor.setARGB(255, 66, 155, 244);
         blockPosition[0] = 0;
@@ -84,6 +79,28 @@ public class MainCanvas extends View {
         blockPosition[2] =  area + area;
         blockPosition[3] = area + area + area;
         blockPosition[4] = area + area + area + area;
+
+
+        red.setARGB(255, 255, 0, 0);
+        white.setARGB(255, 255, 255, 255);
+        red.setTextSize(60);
+        white.setTextSize(60);
+        red.setTypeface(Typeface.MONOSPACE);
+        white.setTypeface(Typeface.MONOSPACE);
+        canvas.drawText("Score " + count , area * 2, 70, white);
+        canvas.drawText("Speed " + velocity , area * 2, 160, white);
+
+
+        if (showMessage > 0 && liveCount == 2) {
+            canvas.drawText("YOU GOT PROTECTION" , area, 300, white);
+            showMessage--;
+        } else if (showMessage > 0 && liveCount == 3) {
+            canvas.drawText("EXTRA PROTECTION" , area, 300, white);
+            showMessage--;
+        }
+
+
+
         Block target = new Block(left,
                 left + (area / 3) + 20,canvas.getHeight()-450, canvas.getHeight() - 500 - (blockPosition[1] / 2));
 
@@ -122,7 +139,7 @@ public class MainCanvas extends View {
 
 
 
-        if (animationTick % 500 == 0 && liveCount < 5) {
+        if (animationTick % 500 == 0 && liveCount < 4) {
             int liveLocation = (int) (Math.random() * width);
             Lives live = new Lives(liveLocation);
             lives.add(live);
@@ -211,7 +228,7 @@ public class MainCanvas extends View {
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i).bottom > height / 2) {
                 for (int j = 0; j < velocity;j++) {
-                    if (target.top - j == blocks.get(i).bottom && skipBlocks == 0) {
+                    if (target.top - j == blocks.get(i).top && skipBlocks == 0) {
                         if (blocks.get(i).left < target.left && target.left < blocks.get(i).right ||
                                 blocks.get(i).left < target.right && target.right < blocks.get(i).right) {
                             if (liveCount > 1){
@@ -235,7 +252,11 @@ public class MainCanvas extends View {
                     lives.get(i).x - lives.get(i).radius <= target.right &&
                     lives.get(i).y + lives.get(i).radius <= target.top &&
                     lives.get(i).y - lives.get(i).radius >= target.bottom) {
+                System.out.println("yo");
+                lives.remove(lives.get(i));
 
+                liveCount++;
+                showMessage += 40;
             }
         }
     }

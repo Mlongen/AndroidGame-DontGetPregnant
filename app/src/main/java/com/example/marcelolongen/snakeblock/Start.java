@@ -15,6 +15,7 @@ public class Start extends AppCompatActivity {
 
 //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setTitle("");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 

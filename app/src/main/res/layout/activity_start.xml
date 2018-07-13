@@ -10,17 +10,14 @@
     tools:context=".Start">
 
     <ImageView
+        android:scaleX="0.8"
+        android:scaleY="0.8"
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/logo" />
 
-    <ImageView
-        android:layout_width="300dp"
-        android:layout_height="320dp"
-        android:scaleX="0.7"
-        android:scaleY="0.7"
-        android:src="@drawable/sperm" />
+
 
     <ImageView
         android:id="@+id/start_game"
