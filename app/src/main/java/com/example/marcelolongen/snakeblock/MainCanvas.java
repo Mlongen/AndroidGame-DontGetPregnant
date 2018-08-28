@@ -72,6 +72,7 @@ public class MainCanvas extends View {
         @SuppressLint("DrawAllocation") Paint blocksColor = new Paint();
         @SuppressLint("DrawAllocation") Paint red = new Paint();
         @SuppressLint("DrawAllocation") Paint white = new Paint();
+        @SuppressLint("DrawAllocation") Paint white2 = new Paint();
 
         blocksColor.setARGB(255, 66, 155, 244);
         blockPosition[0] = 0;
@@ -83,19 +84,34 @@ public class MainCanvas extends View {
 
         red.setARGB(255, 255, 0, 0);
         white.setARGB(255, 255, 255, 255);
+        white2.setARGB(255, 255, 255, 255);
         red.setTextSize(60);
         white.setTextSize(60);
+        white2.setTextSize(50);
         red.setTypeface(Typeface.MONOSPACE);
         white.setTypeface(Typeface.MONOSPACE);
-        canvas.drawText("Score " + count , area * 2, 70, white);
-        canvas.drawText("Speed " + velocity , area * 2, 160, white);
+        white2.setTypeface(Typeface.MONOSPACE);
+        canvas.drawText("Score " + count , area * 2 , 70, white2);
+        canvas.drawText("Speed " + velocity , area * 2, 160, white2);
 
+
+        if (animationTick == 1) {
+            canvas.drawText("TOUCH TO START" , area + 60, 300, white);
+            showMessage--;
+        }
+        if (animationTick < 150) {
+            canvas.drawText("AVOID THE EGGS" , area + 60, 500, white);
+            showMessage--;
+        }
 
         if (showMessage > 0 && liveCount == 2) {
-            canvas.drawText("YOU GOT PROTECTION" , area, 300, white);
+            canvas.drawText("YOU GOT PROTECTION" , area , 300, white);
             showMessage--;
         } else if (showMessage > 0 && liveCount == 3) {
-            canvas.drawText("EXTRA PROTECTION" , area, 300, white);
+            canvas.drawText("EXTRA PROTECTION" , area + 50, 300, white);
+            showMessage--;
+        } else if (showMessage > 0 && liveCount == 1) {
+            canvas.drawText("YOU ARE NOT PROTECTED" , area, 300, white);
             showMessage--;
         }
 
@@ -139,7 +155,7 @@ public class MainCanvas extends View {
 
 
 
-        if (animationTick % 500 == 0 && liveCount < 4) {
+        if (animationTick % 500 == 0 && liveCount < 3) {
             int liveLocation = (int) (Math.random() * width);
             Lives live = new Lives(liveLocation);
             lives.add(live);
@@ -232,8 +248,9 @@ public class MainCanvas extends View {
                         if (blocks.get(i).left < target.left && target.left < blocks.get(i).right ||
                                 blocks.get(i).left < target.right && target.right < blocks.get(i).right) {
                             if (liveCount > 1){
-                                skipBlocks +=velocity - j;
+                                skipBlocks +=velocity;
                                 liveCount--;
+                                showMessage +=80;
                             } else {
                                 Intent intent = new Intent(getRootView().getContext(), Finish.class);
                                 intent.putExtra("score", count);
@@ -256,7 +273,7 @@ public class MainCanvas extends View {
                 lives.remove(lives.get(i));
 
                 liveCount++;
-                showMessage += 40;
+                showMessage += 300;
             }
         }
     }
