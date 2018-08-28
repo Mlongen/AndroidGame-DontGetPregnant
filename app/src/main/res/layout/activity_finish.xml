@@ -14,13 +14,17 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+
         android:layout_marginTop="50dp"
-        android:text="SHIT, SHE GOT PREGNANT"
+        android:text="OH NO!"
         android:textColor="@android:color/white"
-        android:textSize="30sp" />
+        android:textSize="28sp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SHE GOT PREGNANT"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
     <ImageView
         android:src="@drawable/spiderman_cry"
         android:layout_width="200dp"
