@@ -1,4 +1,4 @@
-package com.example.marcelolongen.snakeblock;
+package com.example.marcelolongen.DontGetPregnant;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class Finish extends AppCompatActivity {
     public static final String MY_PREFERENCES = "myPrefs";

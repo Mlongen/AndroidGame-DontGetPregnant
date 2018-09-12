@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-    tools:context="com.example.marcelolongen.snakeblock.MainActivity">
+    tools:context="com.example.marcelolongen.DontGetPregnant.MainActivity">
 
-    <com.example.marcelolongen.snakeblock.MainCanvas
+    <com.example.marcelolongen.DontGetPregnant.MainCanvas
         android:id="@+id/rainDrops"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

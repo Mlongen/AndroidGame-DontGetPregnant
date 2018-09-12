@@ -1,4 +1,4 @@
-package com.example.marcelolongen.snakeblock;
+package com.example.marcelolongen.DontGetPregnant;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;

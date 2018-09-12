@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.example.marcelolongen.snakeblock"
+        applicationId "com.example.marcelolongen.DontGetPregnant"
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1

@@ -1,4 +1,4 @@
-package com.example.marcelolongen.snakeblock;
+package com.example.marcelolongen.DontGetPregnant;
 
 public class Lives {
     public int x;

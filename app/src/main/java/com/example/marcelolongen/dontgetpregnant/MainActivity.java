@@ -1,9 +1,7 @@
-package com.example.marcelolongen.snakeblock;
+package com.example.marcelolongen.DontGetPregnant;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,7 +13,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //Remove title bar
         setTitle("");
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 
 //Remove notification bar

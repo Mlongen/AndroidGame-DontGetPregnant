@@ -1,4 +1,4 @@
-package com.example.marcelolongen.snakeblock;
+package com.example.marcelolongen.DontGetPregnant;
 
 import org.junit.Test;
 

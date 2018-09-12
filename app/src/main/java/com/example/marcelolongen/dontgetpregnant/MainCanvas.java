@@ -1,4 +1,4 @@
-package com.example.marcelolongen.snakeblock;
+package com.example.marcelolongen.DontGetPregnant;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -6,12 +6,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
 
@@ -23,9 +28,7 @@ public class MainCanvas extends View {
     int[] blockPosition = new int[5];
     int velocity = 10;
     int left = 0;
-    int left2 = 0;
-    int left3 = 0;
-    int left4 = 0;
+
     int area;
     int count = 0;
     int liveCount = 1;
@@ -48,6 +51,8 @@ public class MainCanvas extends View {
     private Bitmap characterLPRO;
     private Bitmap characterR;
     private Bitmap characterRPRO;
+
+    private AlertDialog alertDialog;
 
 
     public MainCanvas(Context context, AttributeSet attrs) {
@@ -96,7 +101,26 @@ public class MainCanvas extends View {
 
 
         if (animationTick == 1) {
-            canvas.drawText("TOUCH TO START" , area + 60, 300, white);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            View dialogView = inflater.inflate(R.layout.tutorial_dialog, null);
+            Button okHint = dialogView.findViewById(R.id.okHint);
+            builder.setView(dialogView)
+                    .setCancelable(false);
+            okHint.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mAnimationHelper.start();
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog = builder.create();
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            alertDialog.show();
+            alertDialog.getWindow().setLayout(canvas.getWidth()*2/3, canvas.getHeight()/3);
+
+            left = (width/2) - 20;
             showMessage--;
         }
         if (animationTick < 150) {
@@ -115,22 +139,14 @@ public class MainCanvas extends View {
             showMessage--;
         }
 
-
-
         Block target = new Block(left,
-                left + (area / 3) + 20,canvas.getHeight()-450, canvas.getHeight() - 500 - (blockPosition[1] / 2));
-
-
+                left + (area / 3) ,canvas.getHeight()-450, canvas.getHeight() - 500 - (blockPosition[1] / 2));
 
         drawCharacters(canvas);
 
         if (skipBlocks > 0) {
             skipBlocks--;
         }
-
-
-
-
 
         if (velocity < 29) {
             if (animationTick % 40 == 0) {
@@ -205,20 +221,16 @@ public class MainCanvas extends View {
         }
         if (liveCount == 1 && moving) {
             canvas.drawBitmap(characterL, left, canvas.getHeight()-550, null);
-            canvas.drawBitmap(characterL, left2 - 20, canvas.getHeight()-500, null);
-            canvas.drawBitmap(characterL, left3 + 30, canvas.getHeight()-500, null);
+
         } else if (liveCount == 1 && !moving){
             canvas.drawBitmap(characterR, left, canvas.getHeight()-540, null);
-            canvas.drawBitmap(characterR, left2 - 20, canvas.getHeight()-490, null);
-            canvas.drawBitmap(characterR, left3 + 30, canvas.getHeight()-490, null);
+
         } else if (liveCount > 1 && moving) {
             canvas.drawBitmap(characterLPRO, left, canvas.getHeight()-550, null);
-            canvas.drawBitmap(characterLPRO, left2 - 20, canvas.getHeight()-500, null);
-            canvas.drawBitmap(characterLPRO, left3 + 30, canvas.getHeight()-500, null);
+
         } else if (liveCount > 1 && !moving) {
             canvas.drawBitmap(characterRPRO, left, canvas.getHeight()-540, null);
-            canvas.drawBitmap(characterRPRO, left2 - 20, canvas.getHeight()-490, null);
-            canvas.drawBitmap(characterRPRO, left3 + 30, canvas.getHeight()-490, null);
+
         }
 
     }
@@ -291,14 +303,8 @@ public class MainCanvas extends View {
                 }
                 if (left  < pos) {
                     left += width/70 + velocity;
-                    left2 += width/68 + velocity;
-                    left3 += width/72 + velocity;
-                    left4 += width/68 + velocity;
                 } if (left  > pos) {
                     left -= width/70 + velocity;
-                    left2 -= width/68 + velocity;
-                    left3 -= width/72 + velocity;
-                    left4 -= width/68 + velocity;
                 }
                 break;
             }
