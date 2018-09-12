@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -68,27 +69,26 @@ public class MainCanvas extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
-        Bitmap resizedPill = Bitmap.createScaledBitmap(pill, 80, 90, false);
-        characterL = Bitmap.createScaledBitmap(character1_left, 70, 180, false);
-        characterLPRO = Bitmap.createScaledBitmap(character2_left, 70, 180, false);
-        characterR = Bitmap.createScaledBitmap(character1_right, 70, 180, false);
-        characterRPRO = Bitmap.createScaledBitmap(character2_right, 70, 180, false);
-        helperScore = count;
         area = canvas.getWidth() / 5;
         height = canvas.getHeight();
         width = canvas.getWidth();
+        Bitmap resizedPill = Bitmap.createScaledBitmap(pill, area/3, height /22, false);
+        characterL = Bitmap.createScaledBitmap(character1_left, area/3, height / 10, false);
+        characterLPRO = Bitmap.createScaledBitmap(character2_left, area/3, height / 10, false);
+        characterR = Bitmap.createScaledBitmap(character1_right, area/3, height / 10, false);
+        characterRPRO = Bitmap.createScaledBitmap(character2_right, area/3, height / 10, false);
+        helperScore = count;
+
+
         @SuppressLint("DrawAllocation") Paint blocksColor = new Paint();
         @SuppressLint("DrawAllocation") Paint red = new Paint();
-        @SuppressLint("DrawAllocation") Paint white = new Paint();
-        @SuppressLint("DrawAllocation") Paint white2 = new Paint();
 
         blocksColor.setARGB(255, 66, 155, 244);
         blockPosition[0] = 0;
         blockPosition[1] = area;
-        blockPosition[2] =  area + area;
-        blockPosition[3] = area + area + area;
-        blockPosition[4] = area + area + area + area;
+        blockPosition[2] =  area * 2;
+        blockPosition[3] = area * 3;
+        blockPosition[4] = area * 4;
 
 
         if (animationTick == 1) {
@@ -109,7 +109,7 @@ public class MainCanvas extends View {
             alertDialog = builder.create();
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             alertDialog.show();
-            alertDialog.getWindow().setLayout(canvas.getWidth()*2/3, canvas.getHeight()/3);
+            alertDialog.getWindow().setLayout(canvas.getWidth() * 3/4, canvas.getHeight()/2);
 
             left = (width/2) - 20;
             showMessage--;
@@ -119,7 +119,7 @@ public class MainCanvas extends View {
 
 
         Block target = new Block(left,
-                left + (area / 3) ,canvas.getHeight()-450, canvas.getHeight() - 500 - (blockPosition[1] / 2));
+                left + (area / 3) ,height - (int)(height / 5.5) + 30, height - (int)(height/ 6) - (blockPosition[1] / 2));
 
         drawCharacters(canvas);
 
@@ -152,7 +152,7 @@ public class MainCanvas extends View {
 
         if (animationTick % 500 == 0 && liveCount < 3) {
             int liveLocation = (int) (Math.random() * width);
-            Lives live = new Lives(liveLocation);
+            Lives live = new Lives(liveLocation, width/37);
             lives.add(live);
 
         }
@@ -199,18 +199,19 @@ public class MainCanvas extends View {
             moving = false;
         }
         if (liveCount == 1 && moving) {
-            canvas.drawBitmap(characterL, left, canvas.getHeight()-550, null);
+            canvas.drawBitmap(characterL, left, canvas.getHeight()- (int)(height / 5.5), null);
 
         } else if (liveCount == 1 && !moving){
-            canvas.drawBitmap(characterR, left, canvas.getHeight()-540, null);
+            canvas.drawBitmap(characterR, left, canvas.getHeight() - (int)(height / 5.5) - 10, null);
 
         } else if (liveCount > 1 && moving) {
-            canvas.drawBitmap(characterLPRO, left, canvas.getHeight()-550, null);
+            canvas.drawBitmap(characterLPRO, left, canvas.getHeight()-(int)(height / 5.5), null);
 
         } else if (liveCount > 1 && !moving) {
-            canvas.drawBitmap(characterRPRO, left, canvas.getHeight()-540, null);
+            canvas.drawBitmap(characterRPRO, left, canvas.getHeight()-(int)(height / 5.5) - 10, null);
 
         }
+
 
     }
 
@@ -233,9 +234,9 @@ public class MainCanvas extends View {
 
     public void checkIfHit(Block target) {
         for (int i = 0; i < blocks.size(); i++) {
-            if (blocks.get(i).bottom > height / 2) {
+            if (blocks.get(i).bottom > height / 3) {
                 for (int j = 0; j < velocity;j++) {
-                    if (target.top - j == blocks.get(i).top && skipBlocks == 0) {
+                    if (target.top + j == blocks.get(i).top && skipBlocks == 0) {
                         if (blocks.get(i).left < target.left && target.left < blocks.get(i).right ||
                                 blocks.get(i).left < target.right && target.right < blocks.get(i).right) {
                             if (liveCount > 1){
@@ -260,11 +261,10 @@ public class MainCanvas extends View {
                     lives.get(i).x - lives.get(i).radius <= target.right &&
                     lives.get(i).y + lives.get(i).radius <= target.top &&
                     lives.get(i).y - lives.get(i).radius >= target.bottom) {
-                System.out.println("yo");
                 lives.remove(lives.get(i));
 
                 liveCount++;
-                showMessage += 300;
+                showMessage += 200;
             }
         }
     }
