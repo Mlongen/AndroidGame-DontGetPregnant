@@ -1,6 +1,7 @@
 package com.example.marcelolongen.DontGetPregnant;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -21,22 +22,23 @@ import android.widget.Button;
 import java.util.ArrayList;
 
 public class MainCanvas extends View {
-    private AnimationHelper mAnimationHelper = new AnimationHelper(this, 50);
+
+
     private ArrayList<Rect> blocks = new ArrayList<>();
     private ArrayList<Lives>  lives = new ArrayList<>();
-    private int animationTick = 1;
+    public static int animationTick = 1;
     int[] blockPosition = new int[5];
     int velocity = 10;
     int left = 0;
 
     int area;
-    int count = 0;
-    int liveCount = 1;
+    public int count = 0;
+    private static int liveCount = 1;
     private int width = 0;
     private int height = 0;
     private boolean hasStarted = false;
     private boolean moving = false;
-    private int showMessage = 0;
+    private static int showMessage = 0;
 
     private int skipBlocks = 0;
     private Bitmap pill = BitmapFactory.decodeResource(getResources(), R.drawable.pill);
@@ -51,6 +53,8 @@ public class MainCanvas extends View {
     private Bitmap characterLPRO;
     private Bitmap characterR;
     private Bitmap characterRPRO;
+    private static int helperScore = 0;
+    private AnimationHelper mAnimationHelper = new AnimationHelper(this, 50);
 
     private AlertDialog alertDialog;
 
@@ -60,17 +64,17 @@ public class MainCanvas extends View {
     }
 
 
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
 
         Bitmap resizedPill = Bitmap.createScaledBitmap(pill, 80, 90, false);
         characterL = Bitmap.createScaledBitmap(character1_left, 70, 180, false);
         characterLPRO = Bitmap.createScaledBitmap(character2_left, 70, 180, false);
         characterR = Bitmap.createScaledBitmap(character1_right, 70, 180, false);
         characterRPRO = Bitmap.createScaledBitmap(character2_right, 70, 180, false);
-
+        helperScore = count;
         area = canvas.getWidth() / 5;
         height = canvas.getHeight();
         width = canvas.getWidth();
@@ -85,19 +89,6 @@ public class MainCanvas extends View {
         blockPosition[2] =  area + area;
         blockPosition[3] = area + area + area;
         blockPosition[4] = area + area + area + area;
-
-
-        red.setARGB(255, 255, 0, 0);
-        white.setARGB(255, 255, 255, 255);
-        white2.setARGB(255, 255, 255, 255);
-        red.setTextSize(60);
-        white.setTextSize(60);
-        white2.setTextSize(50);
-        red.setTypeface(Typeface.MONOSPACE);
-        white.setTypeface(Typeface.MONOSPACE);
-        white2.setTypeface(Typeface.MONOSPACE);
-        canvas.drawText("Score " + count , area * 2 , 70, white2);
-        canvas.drawText("Speed " + velocity , area * 2, 160, white2);
 
 
         if (animationTick == 1) {
@@ -123,21 +114,9 @@ public class MainCanvas extends View {
             left = (width/2) - 20;
             showMessage--;
         }
-        if (animationTick < 150) {
-            canvas.drawText("AVOID THE EGGS" , area + 60, 500, white);
-            showMessage--;
-        }
 
-        if (showMessage > 0 && liveCount == 2) {
-            canvas.drawText("YOU GOT PROTECTION" , area , 300, white);
-            showMessage--;
-        } else if (showMessage > 0 && liveCount == 3) {
-            canvas.drawText("EXTRA PROTECTION" , area + 50, 300, white);
-            showMessage--;
-        } else if (showMessage > 0 && liveCount == 1) {
-            canvas.drawText("YOU ARE NOT PROTECTED" , area, 300, white);
-            showMessage--;
-        }
+
+
 
         Block target = new Block(left,
                 left + (area / 3) ,canvas.getHeight()-450, canvas.getHeight() - 500 - (blockPosition[1] / 2));
@@ -313,4 +292,34 @@ public class MainCanvas extends View {
         return true;
     }
 
+    public static String getHelperScore() {
+        String displayed = null;
+
+        if (showMessage > 0 && liveCount == 2) {
+            displayed = ("YOU GOT PROTECTION");
+            showMessage--;
+        } else if (showMessage > 0 && liveCount == 3) {
+            displayed = ("EXTRA PROTECTION");
+            showMessage--;
+        } else if (showMessage > 0 && liveCount == 1) {
+            displayed = ("YOU ARE NOT PROTECTED");
+            showMessage--;
+        } else {
+            if (helperScore < 150) {
+                displayed = ("Avoid the eggs!");
+            } else {
+                if (liveCount == 2) {
+                    displayed = ("Protection lv: 1     Score: " + helperScore);
+                } else if (liveCount == 3){
+                    displayed = ("Protection lv: 2     Score: " + helperScore);
+                } else {
+                    displayed = ("Score: " + helperScore);
+                }
+
+            }
+
+        }
+
+        return displayed;
+    }
 }

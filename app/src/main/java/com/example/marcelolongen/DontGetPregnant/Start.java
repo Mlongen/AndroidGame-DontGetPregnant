@@ -6,19 +6,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 public class Start extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-//Remove notification bar
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setTitle("");
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        this.requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+//Remove notification bar
 
+        setContentView(R.layout.activity_start);
+        this.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.mytitle);
+        TextView text = findViewById(R.id.myTitle);
+        text.setText("Welcome!");
 
     }
 

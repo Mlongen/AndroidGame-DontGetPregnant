@@ -23,6 +23,7 @@ public class Finish extends AppCompatActivity {
         Intent intent = getIntent();
         thisScore = intent.getIntExtra("score", 0);
 
+        AnimationHelper.stop();
         SharedPreferences prefs = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
         restoredScore = prefs.getInt("highScore", 0);
         if (thisScore > restoredScore) {

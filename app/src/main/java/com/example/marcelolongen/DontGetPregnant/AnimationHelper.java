@@ -1,6 +1,10 @@
 package com.example.marcelolongen.DontGetPregnant;
 
+import android.app.Activity;
+import android.content.Context;
 import android.view.View;
+
+
 
 /**
  *
@@ -11,8 +15,9 @@ import android.view.View;
 public class AnimationHelper {
     private View view = null;
     private int fps;
-    private Thread thread = null;
-    private volatile boolean isRunning = false;
+    private static Thread thread = null;
+    private static boolean isRunning = false;
+
 
     /**
      * Constructs a new drawing thread to update the given view
@@ -47,7 +52,7 @@ public class AnimationHelper {
     /**
      * Stops the thread so that it will not repaint the view any more.
      */
-    public void stop() {
+    public static void stop() {
         if (thread != null) {
             isRunning = false;
             try {
@@ -73,12 +78,11 @@ public class AnimationHelper {
                 } catch (InterruptedException ie) {
                     isRunning = false;
                 }
-
                 // might have been stopped while sleeping
                 if (!isRunning) {
                     break;
                 }
-
+                MainActivity.updateScore(MainCanvas.getHelperScore());
                 // the view to redraw
                 view.postInvalidate();
             }
