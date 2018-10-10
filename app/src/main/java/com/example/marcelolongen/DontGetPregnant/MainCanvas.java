@@ -1,7 +1,6 @@
 package com.example.marcelolongen.DontGetPregnant;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,8 +8,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
@@ -18,22 +15,24 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Objects;
+
+import static android.graphics.Bitmap.createScaledBitmap;
 
 public class MainCanvas extends View {
 
 
-    private ArrayList<Rect> blocks = new ArrayList<>();
-    private ArrayList<Lives>  lives = new ArrayList<>();
-    public static int animationTick = 1;
-    int[] blockPosition = new int[5];
-    int velocity = 10;
-    int left = 0;
+    private final ArrayList<Circle>  lives = new ArrayList<>();
+    private final ArrayList<Circle> blocks = new ArrayList<>();
+    private static int animationTick = 1;
+    private final int[] blockPosition = new int[5];
+    private int velocity = 10;
+    private int left = 0;
 
-    int area;
-    public int count = 0;
+    private int area;
+    private int count = 0;
     private static int liveCount = 1;
     private int width = 0;
     private int height = 0;
@@ -42,20 +41,21 @@ public class MainCanvas extends View {
     private static int showMessage = 0;
 
     private int skipBlocks = 0;
-    private Bitmap pill = BitmapFactory.decodeResource(getResources(), R.drawable.pill);
-    private Bitmap character1_left = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_left);
-    private Bitmap character1_right = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_right);
-    private Bitmap character2_left = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_pro_left);
-    private Bitmap character2_right = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_pro_right);
+    private final Bitmap block = BitmapFactory.decodeResource(getResources(), R.drawable.brick);
+    private final Bitmap pill = BitmapFactory.decodeResource(getResources(), R.drawable.pill);
+    private final Bitmap character1_left = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_left);
+    private final Bitmap character1_right = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_right);
+    private final Bitmap character2_left = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_pro_left);
+    private final Bitmap character2_right = BitmapFactory.decodeResource(getResources(), R.drawable.sperm_pro_right);
 
-    private Bitmap block = BitmapFactory.decodeResource(getResources(), R.drawable.brick);
-    private MotionEvent event;
+    private Bitmap resizedBlock;
+    private Bitmap resizedPill;
     private Bitmap characterL;
     private Bitmap characterLPRO;
     private Bitmap characterR;
     private Bitmap characterRPRO;
     private static int helperScore = 0;
-    private AnimationHelper mAnimationHelper = new AnimationHelper(this, 50);
+    private final AnimationHelper mAnimationHelper = new AnimationHelper(this, 100);
 
     private AlertDialog alertDialog;
 
@@ -69,33 +69,48 @@ public class MainCanvas extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        area = canvas.getWidth() / 5;
-        height = canvas.getHeight();
-        width = canvas.getWidth();
-        Bitmap resizedPill = Bitmap.createScaledBitmap(pill, area/3, height /22, false);
-        characterL = Bitmap.createScaledBitmap(character1_left, area/3, height / 10, false);
-        characterLPRO = Bitmap.createScaledBitmap(character2_left, area/3, height / 10, false);
-        characterR = Bitmap.createScaledBitmap(character1_right, area/3, height / 10, false);
-        characterRPRO = Bitmap.createScaledBitmap(character2_right, area/3, height / 10, false);
-        helperScore = count;
+        area = getWidth() / 5;
+        height = getHeight();
+        width = getWidth();
 
+        resizeSprites();
 
-        @SuppressLint("DrawAllocation") Paint blocksColor = new Paint();
-        @SuppressLint("DrawAllocation") Paint red = new Paint();
-
-        blocksColor.setARGB(255, 66, 155, 244);
         blockPosition[0] = 0;
         blockPosition[1] = area;
         blockPosition[2] =  area * 2;
         blockPosition[3] = area * 3;
         blockPosition[4] = area * 4;
 
+        helperScore = count;
 
+        showDialog();
+
+        left = (width/2) - 20;
+        @SuppressLint("DrawAllocation") Block target = new Block(left,
+                left + (area / 3) ,height - (int)(height / 5.5) + 30, height - height/ 6 - (blockPosition[1] / 2));
+
+
+        //create elements
+        createBlocks();
+        createPills();
+
+        // draw elements
+        drawCharacters(canvas);
+        drawPills(canvas, resizedPill, resizedBlock);
+
+        // run checks
+        incrementersAndDecrementers();
+        checkIfElementOnScreen();
+        checkIfHit();
+        checkIfEat(target);
+
+    }
+
+    private void showDialog() {
         if (animationTick == 1) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            @SuppressLint("DrawAllocation") AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            View dialogView = inflater.inflate(R.layout.tutorial_dialog, null);
+            @SuppressLint("InflateParams") View dialogView = inflater.inflate(R.layout.tutorial_dialog, null);
             Button okHint = dialogView.findViewById(R.id.okHint);
             builder.setView(dialogView)
                     .setCancelable(false);
@@ -107,155 +122,147 @@ public class MainCanvas extends View {
                 }
             });
             alertDialog = builder.create();
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(alertDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             alertDialog.show();
-            alertDialog.getWindow().setLayout(canvas.getWidth() * 3/4, canvas.getHeight()/2);
+            alertDialog.getWindow().setLayout(getWidth() * 3/4, getHeight()/2);
 
-            left = (width/2) - 20;
-            showMessage--;
+
+
         }
+    }
 
-
-
-
-        Block target = new Block(left,
-                left + (area / 3) ,height - (int)(height / 5.5) + 30, height - (int)(height/ 6) - (blockPosition[1] / 2));
-
-        drawCharacters(canvas);
-
+    private void incrementersAndDecrementers() {
+        showMessage--;
         if (skipBlocks > 0) {
             skipBlocks--;
         }
+        if (animationTick % 150 == 0 && velocity < 30) {
+            velocity++;
+        }
+        animationTick++;
+        count++;
+    }
 
+    private void resizeSprites() {
+        resizedBlock = createScaledBitmap(block, area, area, false);
+        resizedPill = createScaledBitmap(pill, area/3, height /22, false);
+        characterL = createScaledBitmap(character1_left, area/3, height / 10, false);
+        characterLPRO = createScaledBitmap(character2_left, area/3, height / 10, false);
+        characterR = createScaledBitmap(character1_right, area/3, height / 10, false);
+        characterRPRO = createScaledBitmap(character2_right, area/3, height / 10, false);
+    }
+
+    private void createBlocks() {
         if (velocity < 29) {
             if (animationTick % 40 == 0) {
                 int random = (int) (Math.random() * 5);
                 for (int i = 0; i < random; i ++) {
-                    createBlock();
+                    createBlockNew();
                 }
             }
         } else {
             if (animationTick % 15 == 0) {
                 int random = (int) (Math.random() * 5);
                 for (int i = 0; i < random; i ++) {
-                        createBlock();
-
+                    createBlockNew();
 
                 }
             }
         }
+    }
 
-
-        drawBlocks(canvas, red, target);
-
-
-
+    private void createPills() {
         if (animationTick % 500 == 0 && liveCount < 3) {
             int liveLocation = (int) (Math.random() * width);
-            Lives live = new Lives(liveLocation, width/37);
+            Circle live = new Circle(liveLocation, width/37);
             lives.add(live);
 
         }
+    }
 
+    private void drawPills(Canvas canvas, Bitmap resizedPill, Bitmap resizedBlock) {
         for (int i = 0; i < lives.size();i++) {
             lives.get(i).y += velocity;
             canvas.drawBitmap(resizedPill, lives.get(i).x, lives.get(i).y, null);
 
         }
-
-        Paint randomTarg = new Paint();
-        randomTarg.setARGB(255, 255, 0, 0);
-
-
-        checkIfBlockOnScreen(height);
-
-
-        animationTick++;
-
-        if (animationTick % 150 == 0 && velocity < 30) {
-            velocity++;
-        }
-        count++;
-
-        checkIfEat(target);
-
-    }
-
-    private void drawBlocks(Canvas canvas, Paint red, Block target) {
+        @SuppressLint("DrawAllocation") Paint red = new Paint();
         for (int i = 0; i < blocks.size(); i++) {
-            blocks.get(i).bottom += velocity;
-            blocks.get(i).top += velocity;
-            canvas.drawBitmap(block, null, blocks.get(i), red);
-            checkIfHit(target);
+            blocks.get(i).y += velocity;
+            canvas.drawCircle(blocks.get(i).x, blocks.get(i).y, blocks.get(i).radius, red);
+            canvas.drawBitmap(resizedBlock, blocks.get(i).x - area /2, blocks.get(i).y - area/ 2,null);
 
-        }
+            }
     }
+
 
     private void drawCharacters(Canvas canvas) {
-        if (animationTick % 15 == 0) {
+        if (animationTick % 10 == 0) {
             moving = true;
         }
-        if (animationTick % 30 == 0) {
+        if (animationTick % 20 == 0) {
             moving = false;
         }
         if (liveCount == 1 && moving) {
-            canvas.drawBitmap(characterL, left, canvas.getHeight()- (int)(height / 5.5), null);
+            canvas.drawBitmap(characterL, left, (float) (height - height / 5.5), null);
 
-        } else if (liveCount == 1 && !moving){
-            canvas.drawBitmap(characterR, left, canvas.getHeight() - (int)(height / 5.5) - 10, null);
+        } else if (liveCount == 1){
+            canvas.drawBitmap(characterR, left, (float) (height - height / 5.5 - 10), null);
 
         } else if (liveCount > 1 && moving) {
-            canvas.drawBitmap(characterLPRO, left, canvas.getHeight()-(int)(height / 5.5), null);
+            canvas.drawBitmap(characterLPRO, left, (float) (height - height / 5.5), null);
 
-        } else if (liveCount > 1 && !moving) {
-            canvas.drawBitmap(characterRPRO, left, canvas.getHeight()-(int)(height / 5.5) - 10, null);
+        } else if (liveCount > 1) {
+            canvas.drawBitmap(characterRPRO, left, (float) (height - height / 5.5 - 10), null);
 
         }
 
 
     }
 
-    private void checkIfBlockOnScreen(int height) {
+    private void checkIfElementOnScreen() {
         for (int i = 0; i < blocks.size(); i++){
-            if (blocks.get(i).bottom > height) {
+            if (blocks.get(i).y > height) {
                 blocks.remove(blocks.get(i));
             }
         }
+        for (int i = 0; i < lives.size(); i++){
+            if (lives.get(i).y > height) {
+                lives.remove(lives.get(i));
+            }
+        }
     }
 
-    public void createBlock() {
+    private void createBlockNew() {
         int firstBlock = (int) (Math.random() * 5);
-        Block block = new Block(blockPosition[firstBlock], blockPosition[firstBlock] + area, area, 0);
-        Rect rectangle = new Rect(block.left, block.top, block.right, block.bottom);
-
-        blocks.add(rectangle);
+        Circle circle = new Circle(blockPosition[firstBlock] + area / 2, area / 2);
+        blocks.add(circle);
     }
 
 
-    public void checkIfHit(Block target) {
+
+    private void checkIfHit() {
+        float spermTip = (float) (height - height / 7);
         for (int i = 0; i < blocks.size(); i++) {
-            if (blocks.get(i).bottom > height / 3) {
-                for (int j = 0; j < velocity;j++) {
-                    if (target.top + j == blocks.get(i).top && skipBlocks == 0) {
-                        if (blocks.get(i).left < target.left && target.left < blocks.get(i).right ||
-                                blocks.get(i).left < target.right && target.right < blocks.get(i).right) {
-                            if (liveCount > 1){
-                                skipBlocks +=velocity;
-                                liveCount--;
-                                showMessage +=80;
-                            } else {
-                                Intent intent = new Intent(getRootView().getContext(), Finish.class);
-                                intent.putExtra("score", count);
-                                getContext().startActivity(intent);
-                                break;
-                            }
-                        }
-                    }
+            if (blocks.get(i).x + blocks.get(i).radius >= left + 10 &&
+                    blocks.get(i).x - blocks.get(i).radius<= left + (area/3) &&
+                    blocks.get(i).y - blocks.get(i).radius <= spermTip &&
+                    blocks.get(i).y + blocks.get(i).radius >= spermTip && skipBlocks == 0) {
+
+                if (liveCount > 1){
+                    skipBlocks +=velocity;
+                    liveCount--;
+                    showMessage +=80;
+                } else {
+                Intent intent = new Intent(getRootView().getContext(), Finish.class);
+                intent.putExtra("score", count);
+                getContext().startActivity(intent);
+                break;
                 }
             }
-         }
+        }
     }
-    public void checkIfEat(Block target) {
+    private void checkIfEat(Block target) {
         for (int i = 0; i < lives.size();i++) {
             if (lives.get(i).x + lives.get(i).radius >= target.left &&
                     lives.get(i).x - lives.get(i).radius <= target.right &&
@@ -272,7 +279,6 @@ public class MainCanvas extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        this.event = event;
         float  pos = event.getX();
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE: {
@@ -293,7 +299,7 @@ public class MainCanvas extends View {
     }
 
     public static String getHelperScore() {
-        String displayed = null;
+        String displayed;
 
         if (showMessage > 0 && liveCount == 2) {
             displayed = ("YOU GOT PROTECTION");
